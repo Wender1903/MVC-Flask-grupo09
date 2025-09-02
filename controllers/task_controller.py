@@ -10,7 +10,7 @@ class TaskController:
         return render_template("tasks.html", tasks=tasks) 
     
     @staticmethod
-    def create_tasks():
+    def create_task():
         if request.method == "GET":
             users = User.query.all()
             return render_template("create_task.html", users=users)    
@@ -30,7 +30,7 @@ class TaskController:
             return redirect(url_for("list_tasks"))
         
     @staticmethod
-    def update_tasks(task_id):
+    def update_task(task_id):
         task = Task.query.get(task_id)
 
         if not task:
