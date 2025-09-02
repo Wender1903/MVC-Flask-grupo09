@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import db
 from models.task import Task
 from models.user import User
@@ -26,5 +26,21 @@ class TaskController:
             
             db.session.add(new_task)
             db.session.commit()
-            
+
             return redirect(url_for("list_tasks"))
+        
+    @staticmethod
+    def update_tasks(task_id):
+        task = Task.query.get(task_id)
+
+        if not task:
+            return jsonify({"mensagem": "Erro, Tarefa não encontrada"}), 404
+        
+        if task.status == "Pendente":
+            task.status = "Concluído"
+        else:
+            task.status = "Pendente"
+
+        db.session.commit()
+        return redirect(url_for("list_tasks"))
+
