@@ -43,4 +43,14 @@ class TaskController:
 
         db.session.commit()
         return redirect(url_for("list_tasks"))
-
+    
+    @staticmethod
+    def delete_task(task_id):
+        task = Task.query.get(task_id)
+        if not task:
+            return jsonify({"mensagem": "Erro, Tarefa não encontrada"}), 404
+        
+        db.session.delete(task)
+        db.session.commit()
+        
+        return redirect(url_for('list_tasks'))
