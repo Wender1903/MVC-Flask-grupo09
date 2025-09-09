@@ -3,95 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>Minhas Tarefas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #007BFF;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        a, button {
-            text-decoration: none;
-            padding: 6px 12px;
-            margin: 2px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        a {
-            background-color: #28a745;
-            color: white;
-        }
-        button.concluir {
-            background-color: #007BFF;
-            color: white;
-        }
-        button.excluir {
-            background-color: #dc3545;
-            color: white;
-        }
-        form {
-            display: inline;
-        }
-    </style>
 </head>
 <body>
     <h1>Minhas Tarefas</h1>
 
-    <p><a href="{{ url_for('create_task') }}">+ Criar Nova Tarefa</a></p>
+    <button onclick="carregarTarefas()">Recarregar Lista</button>
+    <ul id="lista-tarefas"></ul>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th>Usuário</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
-                <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.description }}</td>
-                    <td>{{ task.status }}</td>
-                    <td>{{ task.user.name }}</td>
-                    <td>
-                        <!-- Botão de Concluir/Reabrir -->
-                        <form method="POST" action="{{ url_for('update_task_status', task_id=task.id) }}">
-                            <button type="submit" class="concluir">
-                                {% if task.status == "Pendente" %}Concluir{% else %}Reabrir{% endif %}
-                            </button>
-                        </form>
+    <script>
+        const API_URL = "http://localhost:5000/tasks";
 
-                        <!-- Botão de Excluir -->
-                        <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}">
-                            <button type="submit" class="excluir">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        async function carregarTarefas() {
+            const resp = await fetch(API_URL);
+            const tasks = await resp.json();
+
+            const lista = document.getElementById("lista-tarefas");
+            lista.innerHTML = "";
+
+            tasks.forEach(task => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <b>${task.title}</b> - ${task.status}
+                    <button onclick="atualizarStatus(${task.id})">Concluir/Reabrir</button>
+                    <button onclick="excluirTarefa(${task.id})">Excluir</button>
+                `;
+                lista.appendChild(li);
+            });
+        }
+
+        async function atualizarStatus(id) {
+            await fetch(`${API_URL}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "Concluído" }) 
+            });
+            carregarTarefas();
+        }
+
+        async function excluirTarefa(id) {
+            await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            carregarTarefas();
+        }
+
+        carregarTarefas();
+    </script>
 </body>
 </html>

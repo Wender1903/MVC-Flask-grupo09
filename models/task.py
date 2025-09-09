@@ -11,3 +11,12 @@ class Task(db.Model):
 
     # Cada tarefa pertence a um único usuário
     user = db.relationship('User', back_populates='tasks')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "status": self.status,
+            "user_id": self.user_id,
+        }
