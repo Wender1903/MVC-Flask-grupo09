@@ -131,7 +131,6 @@ class TaskController:
 
         data = request.get_json(silent=True) or {}
 
-        # Atualiza somente os campos enviados
         for field in ("title", "description", "status", "user_id"):
             if field in data and data[field] is not None:
                 setattr(task, field, data[field])
